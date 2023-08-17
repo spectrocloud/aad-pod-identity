@@ -17,9 +17,10 @@ RUN export GOOS=$TARGETOS && \
     export GOARM=$(echo ${TARGETPLATFORM} | cut -d / -f3 | tr -d 'v') && \
     make build
 
-FROM registry.k8s.io/build-image/debian-iptables:bullseye-v1.5.7 AS nmi
+FROM gcr.io/spectro-common-dev/fayasa/debian-iptables:latest AS nmi
 RUN apt update && \
     apt upgrade -y && \
+    apt upgrade -y sqlite3 && \
     clean-install ca-certificates
 COPY --from=builder /go/src/github.com/Azure/aad-pod-identity/bin/aad-pod-identity/nmi /bin/
 RUN useradd -u 10001 nonroot
