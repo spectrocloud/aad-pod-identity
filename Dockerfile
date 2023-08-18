@@ -17,11 +17,17 @@ RUN export GOOS=$TARGETOS && \
     export GOARM=$(echo ${TARGETPLATFORM} | cut -d / -f3 | tr -d 'v') && \
     make build
 
-FROM gcr.io/spectro-common-dev/fayasa/debian-iptables:latest AS nmi
+FROM gcr.io/spectro-dev-public/jayeshsrivastava/aad-pod-identity/nmi-base:20230818.1135 AS nmi
 RUN apt update && \
     apt upgrade -y && \
-    apt upgrade -y sqlite3 && \
-    clean-install ca-certificates
+    apt install -y --no-install-recommends ca-certificates
+RUN apt clean -y
+RUN rm -rf \
+   /var/cache/debconf/* \
+   /var/lib/apt/lists/* \
+   /var/log/* \
+   /tmp/* \
+   /var/tmp/*
 COPY --from=builder /go/src/github.com/Azure/aad-pod-identity/bin/aad-pod-identity/nmi /bin/
 RUN useradd -u 10001 nonroot
 USER nonroot

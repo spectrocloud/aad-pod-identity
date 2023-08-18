@@ -1,0 +1,16 @@
+FROM debian:bookworm
+
+RUN apt update
+RUN apt install -y --no-install-recommends conntrack \
+    ebtables \
+    ipset \
+    iptables \
+    kmod \
+    netbase
+RUN apt clean -y
+RUN rm -rf \
+   /var/cache/debconf/* \
+   /var/lib/apt/lists/* \
+   /var/log/* \
+   /tmp/* \
+   /var/tmp/*
