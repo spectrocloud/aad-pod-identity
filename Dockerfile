@@ -17,7 +17,7 @@ RUN export GOOS=$TARGETOS && \
     export GOARM=$(echo ${TARGETPLATFORM} | cut -d / -f3 | tr -d 'v') && \
     make build
 
-FROM gcr.io/spectro-dev-public/jayeshsrivastava/aad-pod-identity/nmi-base:20230818.1135 AS nmi
+FROM gcr.io/spectro-dev-public/release/azure-aad-pod-identity/nmi-builder:20230818 AS nmi
 RUN apt update && \
     apt upgrade -y && \
     apt install -y --no-install-recommends ca-certificates
