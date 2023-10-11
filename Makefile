@@ -1,6 +1,6 @@
 ORG_PATH=github.com/Azure
 PROJECT_NAME := aad-pod-identity
-REPO_PATH="$(ORG_PATH)/$(PROJECT_NAME)"
+REPO_PATH=gcr.io/spectro-dev-public/jayeshsrivastava/aad-pod-identity
 NMI_BINARY_NAME := nmi
 MIC_BINARY_NAME := mic
 DEMO_BINARY_NAME := demo
@@ -10,7 +10,10 @@ TEST_GOOS ?= linux
 IDENTITY_VALIDATOR_BINARY_NAME := identityvalidator
 
 DEFAULT_VERSION := v0.0.0-dev
-IMAGE_VERSION ?= $(DEFAULT_VERSION)
+IMAGE_VERSION ?= 20231011.1409
+
+BUILDER_GOLANG_VERSION ?= 1.21
+BUILD_ARGS = --build-arg BUILDER_GOLANG_VERSION=${BUILDER_GOLANG_VERSION}
 
 NMI_VERSION_VAR := $(REPO_PATH)/version.NMIVersion
 MIC_VERSION_VAR := $(REPO_PATH)/version.MICVersion
@@ -35,9 +38,9 @@ GO_BUILD_OPTIONS := --tags "netgo osusergo"  -ldflags "-s -X $(NMI_VERSION_VAR)=
 E2E_TEST_OPTIONS := -count=1 -v -timeout 24h -ginkgo.progress $(E2E_TEST_OPTIONS_EXTRA)
 
 # useful for other docker repos
-REGISTRY_NAME ?= upstreamk8sci
+REGISTRY_NAME ?= gcr.io/spectro-dev-public/jayeshsrivastava/aad-pod-identity
 REPO_PREFIX ?= k8s/aad-pod-identity
-REGISTRY ?= $(REGISTRY_NAME).azurecr.io/$(REPO_PREFIX)
+REGISTRY ?= gcr.io/spectro-dev-public/jayeshsrivastava/aad-pod-identity
 NMI_IMAGE := $(NMI_BINARY_NAME):$(IMAGE_VERSION)
 MIC_IMAGE := $(MIC_BINARY_NAME):$(IMAGE_VERSION)
 DEMO_IMAGE := $(DEMO_BINARY_NAME):$(IMAGE_VERSION)
@@ -151,7 +154,7 @@ docker-buildx-builder:
 
 .PHONY: image-nmi
 image-nmi:
-	docker buildx build \
+	docker buildx build ${BUILD_ARGS}\
 		--target nmi \
 		--no-cache \
 		--build-arg IMAGE_VERSION=$(IMAGE_VERSION) \

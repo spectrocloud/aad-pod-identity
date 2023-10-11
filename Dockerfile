@@ -1,8 +1,7 @@
 ARG BUILDPLATFORM="linux/amd64"
-ARG BUILDERIMAGE="golang:1.19"
 ARG BASEIMAGE=gcr.io/distroless/static:nonroot
-
-FROM --platform=$BUILDPLATFORM $BUILDERIMAGE as builder
+ARG BUILDER_GOLANG_VERSION
+FROM --platform=$BUILDPLATFORM gcr.io/spectro-images-public/golang:${BUILDER_GOLANG_VERSION}-alpine as builder
 
 ARG TARGETPLATFORM
 ARG TARGETOS
