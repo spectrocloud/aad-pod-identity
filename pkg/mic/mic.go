@@ -248,7 +248,7 @@ func (c *Client) Run() {
 // NewLeaderElector - does the required leader election initialization
 func (c *Client) NewLeaderElector(clientSet *kubernetes.Clientset, recorder record.EventRecorder, leaderElectionConfig *LeaderElectionConfig) (*leaderelection.LeaderElector, error) {
 	c.LeaderElectionConfig = leaderElectionConfig
-	resourceLock, err := resourcelock.New(resourcelock.EndpointsResourceLock,
+	resourceLock, err := resourcelock.New(resourcelock.EndpointsLeasesResourceLock,
 		c.Namespace,
 		c.Name,
 		clientSet.CoreV1(),
