@@ -1,0 +1,55 @@
+ARG BUILDER_GOLANG_VERSION
+FROM gcr.io/spectro-dev-public/build-base-images/openssl-fips-ktls:3.2-alpine3.19 as openssl-fips
+
+FROM --platform=$TARGETPLATFORM gcr.io/spectro-images-public/golang:${BUILDER_GOLANG_VERSION}-alpine as builder
+
+ARG TARGETOS
+ARG TARGETARCH
+ARG CRYPTO_LIB
+ENV GOEXPERIMENT=${CRYPTO_LIB:+boringcrypto}
+
+WORKDIR /workspace
+
+COPY . .
+
+RUN mkdir -p bin
+
+RUN if [ ${CRYPTO_LIB} ]; \
+    then \
+      go-build-fips.sh -a -o bin/nmi github.com/Azure/aad-pod-identity/cmd/nmi ;\
+    else \
+      go-build-fips.sh -a -o bin/nmi github.com/Azure/aad-pod-identity/cmd/nmi ;\
+    fi
+
+FROM gcr.io/spectro-dev-public/jayeshsrivastava/aad-pod-identity/nmi-base:20241505 AS nmi-fips
+RUN apk update && \
+    apk add --no-cache ca-certificates
+
+RUN rm -rf \
+   /var/cache/debconf/* \
+   /var/lib/apt/lists/* \
+   /var/log/* \
+   /tmp/* \
+   /var/tmp/*
+COPY --from=builder /workspace/bin/nmi /bin/
+COPY --from=openssl-fips /usr/local/bin/openssl /usr/bin/openssl
+RUN adduser -u 10005 --system nonroot
+USER nonroot
+ENTRYPOINT ["nmi"]
+
+#FROM gcr.io/spectro-dev-public/release/azure-aad-pod-identity/nmi-builder:20231017 AS nmi
+#RUN apt update && \
+#    apt upgrade -y && \
+#    apt install -y --no-install-recommends ca-certificates
+#RUN apt clean -y
+#RUN rm -rf \
+#   /var/cache/debconf/* \
+#   /var/lib/apt/lists/* \
+#   /var/log/* \
+#   /tmp/* \
+#   /var/tmp/*
+#COPY --from=builder /workspace/bin/nmi /bin/
+#COPY --from=openssl-fips /usr/local/bin/openssl /usr/bin/openssl
+#RUN useradd -u 10001 nonroot
+#USER nonroot
+#ENTRYPOINT ["nmi"]

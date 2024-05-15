@@ -1,16 +1,41 @@
-FROM debian:bookworm
+FROM gcr.io/spectro-images-public/third-party/alpine:3.19-fips as base-fips
 
-RUN apt update
-RUN apt install -y --no-install-recommends conntrack \
+RUN apk update
+RUN apk add --no-cache conntrack-tools \
     ebtables \
     ipset \
     iptables \
     kmod \
-    netbase
-RUN apt clean -y
-RUN rm -rf \
-   /var/cache/debconf/* \
-   /var/lib/apt/lists/* \
-   /var/log/* \
-   /tmp/* \
-   /var/tmp/*
+    net-tools
+
+RUN rm -rf /var/lib/apk/lists/* /tmp/* /var/tmp/*
+#RUN apt install -y --no-install-recommends conntrack \
+#    ebtables \
+#    ipset \
+#    iptables \
+#    kmod \
+#    netbase
+#RUN apt clean -y
+#RUN rm -rf \
+#   /var/cache/debconf/* \
+#   /var/lib/apt/lists/* \
+#   /var/log/* \
+#   /tmp/* \
+#   /var/tmp/* \
+
+#FROM debian:bookworm as base
+#
+#RUN apt update
+#RUN apt install -y --no-install-recommends conntrack \
+#    ebtables \
+#    ipset \
+#    iptables \
+#    kmod \
+#    netbase
+#RUN apt clean -y
+#RUN rm -rf \
+#   /var/cache/debconf/* \
+#   /var/lib/apt/lists/* \
+#   /var/log/* \
+#   /tmp/* \
+#   /var/tmp/*
