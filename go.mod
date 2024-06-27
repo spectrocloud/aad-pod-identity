@@ -1,6 +1,8 @@
 module github.com/Azure/aad-pod-identity
 
-go 1.21
+go 1.22
+
+toolchain go1.22.4
 
 require (
 	contrib.go.opencensus.io/exporter/prometheus v0.1.0
